@@ -61,7 +61,6 @@ public:
 					if (nAcceptSocket == SOCKET_ERROR)
 					{
 						LOG(main, LOG_ERROR, "tid=%d WSAAccept failed. Error:%d\n", std::this_thread::get_id(), GetLastError());
-						//std::cout << "tid=" << std::this_thread::get_id() << " WSAAccept failed. Error:" << GetLastError() << std::endl;
 						return;
 					}
 
@@ -69,7 +68,6 @@ public:
 					if (lpHandleData == NULL)
 					{
 						LOG(main, LOG_ERROR, "tid=%d GlobalAlloc( HandleData ) failed. Error:%d\n", std::this_thread::get_id(), GetLastError());
-						//std::cout << "tid=" << std::this_thread::get_id() << " GlobalAlloc( HandleData ) failed. Error:" << GetLastError() << std::endl;
 						return;
 					}
 					memset(lpHandleData, 0, sizeof(PER_HANDLE_DATA));
@@ -78,7 +76,6 @@ public:
 					if (CreateIoCompletionPort((HANDLE)nAcceptSocket, hCompletionPort, (ULONG_PTR)lpHandleData, 0) == NULL)
 					{
 						LOG(main, LOG_ERROR, "tid=%d CreateIoCompletionPort failed. Error:%d\n", std::this_thread::get_id(), GetLastError());
-						//std::cout << "tid=" << std::this_thread::get_id() << " CreateIoCompletionPort failed. Error:" << GetLastError() << std::endl;
 						return;
 					}
 
@@ -86,7 +83,6 @@ public:
 					if (lpIoData == NULL)
 					{
 						LOG(main, LOG_ERROR, "tid=%d GlobalAlloc( IoData ) failed. Error:%d\n", std::this_thread::get_id(), GetLastError());
-						//std::cout << "tid=" << std::this_thread::get_id() << " GlobalAlloc( IoData ) failed. Error:" << GetLastError() << std::endl;
 						return;
 					}
 					memset(lpIoData, 0, sizeof(PER_IO_OPERATEION_DATA));
@@ -102,13 +98,11 @@ public:
 						if (WSAGetLastError() != ERROR_IO_PENDING)
 						{
 							LOG(main, LOG_ERROR, "tid=%d WSARecv() failed. Error:%d\n", std::this_thread::get_id(), GetLastError());
-							//std::cout << "tid=" << std::this_thread::get_id() << " WSARecv() failed. Error:" << GetLastError() << std::endl;
 							return;
 						}
 						else
 						{
 							LOG(main, LOG_ERROR, "tid=%d WSARecv() io pending. Error:%d\n", std::this_thread::get_id(), GetLastError());
-							//std::cout << "tid=" << std::this_thread::get_id() << " WSARecv() io pending" << std::endl;
 							continue;
 						}
 					}

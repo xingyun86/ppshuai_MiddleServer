@@ -91,11 +91,11 @@ int gettimeofday(struct timeval* tv, struct timezone* tz)
 
 #endif
 
-static CRITICAL_SECTION log_locker = { 0 };
+/*static CRITICAL_SECTION log_locker = { 0 };
 #define log_init_lock() InitializeCriticalSection(&log_locker)
 #define log_lock()		EnterCriticalSection(&log_locker)
 #define log_unlock()	LeaveCriticalSection(&log_locker)
-#define log_exit_lock() DeleteCriticalSection(&log_locker)
+#define log_exit_lock() DeleteCriticalSection(&log_locker)*/
 #else
 ///////////////////////////////////////////////////////////////////////////
 #include <stdarg.h>
@@ -115,11 +115,11 @@ static CRITICAL_SECTION log_locker = { 0 };
 #define make_dir(x)				mkdir(x, DEFFILEMODE)
 #define LOG_STDOUT_FILENO		STDOUT_FILENO
 
-static pthread_mutex_t log_locker;
+/*static pthread_mutex_t log_locker;
 #define log_init_lock() pthread_mutex_init(&log_locker,0)
 #define log_lock()		pthread_mutex_lock(&log_locker)
 #define log_unlock()	pthread_mutex_unlock(&log_locker)
-#define log_exit_lock() pthread_mutex_destroy(&log_locker)
+#define log_exit_lock() pthread_mutex_destroy(&log_locker)*/
 
 #endif
 
@@ -162,8 +162,23 @@ struct log_set {
 };
 #pragma pack ()
 
-//static /*__declspec(thread)*/ struct log_set* p_log_set = 0;
-extern /*__declspec(thread)*/ struct log_set* p_log_set;
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#define CLOG_GLOBAL_MACROS	CRITICAL_SECTION log_locker = { 0 };struct log_set* p_log_set;
+extern CRITICAL_SECTION		log_locker;
+#define log_init_lock()		InitializeCriticalSection(&log_locker)
+#define log_lock()			EnterCriticalSection(&log_locker)
+#define log_unlock()		LeaveCriticalSection(&log_locker)
+#define log_exit_lock()		DeleteCriticalSection(&log_locker)
+#else
+#define CLOG_GLOBAL_MACROS	pthread_mutex_t log_locker;struct log_set* p_log_set;
+extern pthread_mutex_t		log_locker;
+#define log_init_lock()		pthread_mutex_init(&log_locker,0)
+#define log_lock()			pthread_mutex_lock(&log_locker)
+#define log_unlock()		pthread_mutex_unlock(&log_locker)
+#define log_exit_lock()		pthread_mutex_destroy(&log_locker)
+#endif
+
+extern struct log_set* p_log_set;
 
 enum log_level_type
 {
@@ -653,6 +668,25 @@ int log_test_init()
 		n_rotatetime, LOG_VERBOSE, DEFAULT_LOG_LIMIT_SIZE, largl, sizeof(largl) / sizeof(*largl));
 	return 0;
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// >>>>>> copy the content to main.c/main.cpp and build <<<<<<
+//
+// #include <stdio.h>
+// #include "clog.h"
+// 
+// // initialize CLOG macro
+// CLOG_GLOBAL_MACROS
+// 
+// int main(int argc, char ** argv)
+// {
+// 	printf("hello from clog_test!\n");
+// 
+// 	log_test_main();
+// 
+// 	return 0;
+// }
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 __inline static 
 int log_test_main()
 {

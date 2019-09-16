@@ -54,7 +54,6 @@ public:
 
 			while (thiz->IsRunning())
 			{
-				//if (GetQueuedCompletionStatus(hComplationPort, &nBytesTransferred, (PULONG_PTR)& lpHandleData, (LPOVERLAPPED*)& lpIoData, INFINITE) == 0)
 				if (GetQueuedCompletionStatus(hComplationPort, &nBytesTransferred, (PULONG_PTR)& lpHandleData, (LPOVERLAPPED*)& lpIoData, 0) == 0)
 				{
 					switch (GetLastError())
@@ -68,7 +67,6 @@ public:
 						break;
 					}
 					LOG(main, LOG_ERROR, "tid=%d GetQueuedCompletionStatus failed. Error:%d\n", std::this_thread::get_id(), GetLastError());
-					//std::cout << "tid=" << std::this_thread::get_id() << " GetQueuedCompletionStatus failed. Error:" << GetLastError() << std::endl;
 					return;
 				}
 
@@ -76,11 +74,9 @@ public:
 				if (nBytesTransferred == 0)
 				{
 					LOG(main, LOG_ERROR, "tid=%d Start closing socket... Error:%d\n", std::this_thread::get_id(), GetLastError());
-					//std::cout << "tid=" << std::this_thread::get_id() << " Start closing socket..." << std::endl;
 					if (CloseHandle((HANDLE)lpHandleData->socket) == SOCKET_ERROR)
 					{
 						LOG(main, LOG_ERROR, "tid=%d Close socket failed. Error:%d\n", std::this_thread::get_id(), GetLastError());
-						//std::cout << "tid=" << std::this_thread::get_id() << " Close socket failed. Error:" << GetLastError() << std::endl;
 						return;
 					}
 
@@ -113,19 +109,16 @@ public:
 						if (WSAGetLastError() != ERROR_IO_PENDING)
 						{
 							LOG(main, LOG_ERROR, "tid=%d WSASend() failed. Error:%d\n", std::this_thread::get_id(), GetLastError());
-							//std::cout << "tid=" << std::this_thread::get_id() << " WSASend() failed. Error:" << GetLastError() << std::endl;
 							return;
 						}
 						else
 						{
 							LOG(main, LOG_ERROR, "tid=%d  WSASend() failed. io pending. Error:%d\n", std::this_thread::get_id(), GetLastError());
-							//std::cout << "tid=" << std::this_thread::get_id() << " WSASend() failed. io pending. Error:" << GetLastError() << std::endl;
 							return;
 						}
 					}
 
-					LOG(main, LOG_INFO, "tid=%d  Send %s\n", std::this_thread::get_id(), lpIoData->buffer);
-					//std::cout << "tid=" << std::this_thread::get_id() << " Send " << lpIoData->buffer << std::endl;
+					LOG(main, LOG_INFO, "tid=%d  Send %.*s\n", std::this_thread::get_id(), nSendBytes - 12, lpIoData->buffer + 12);
 				}
 				else
 				{
@@ -141,13 +134,11 @@ public:
 						if (WSAGetLastError() != ERROR_IO_PENDING)
 						{
 							LOG(main, LOG_ERROR, "tid=%d WSARecv() failed. Error:%d\n", std::this_thread::get_id(), GetLastError());
-							//std::cout << "tid=" << std::this_thread::get_id() << " WSARecv() failed. Error:" << GetLastError() << std::endl;
 							return;
 						}
 						else
 						{
 							LOG(main, LOG_ERROR, "tid=%d WSARecv() io pending. Error:%d\n", std::this_thread::get_id(), GetLastError());
-							//std::cout << "tid=" << std::this_thread::get_id() << " WSARecv() io pending" << std::endl;
 							continue;
 						}
 					}

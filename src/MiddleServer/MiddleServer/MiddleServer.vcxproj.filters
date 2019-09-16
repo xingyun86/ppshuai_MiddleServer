@@ -27,9 +27,6 @@
     <ClCompile Include="iocp\iocp.cpp">
       <Filter>Source Files\iocp</Filter>
     </ClCompile>
-    <ClCompile Include="common\clog.cpp">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="iocp\iocp.h">

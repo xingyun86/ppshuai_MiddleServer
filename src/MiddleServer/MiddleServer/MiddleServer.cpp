@@ -2,6 +2,10 @@
 //
 
 #include <header.h>
+
+// initialize CLOG macro
+CLOG_GLOBAL_MACROS
+
 #define socket_type int32_t
 
 class c_info {

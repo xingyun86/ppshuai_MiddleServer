@@ -161,7 +161,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="common\clog.cpp" />
     <ClCompile Include="iocp\iocp.cpp" />
     <ClCompile Include="MiddleServer.cpp" />
   </ItemGroup>
